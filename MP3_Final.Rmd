@@ -1,0 +1,146 @@
+---
+title: "MP3"
+author: "Phil Kaplan, Jaan Selod, Emma Laslo"
+date: "2024-03-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+#Introduction 
+
+Studies to Include: 
+https://www.ncbi.nlm.nih.gov/books/NBK556137/
+https://www.sciencedirect.com/science/article/pii/S2211379717304862#:~:text=Salm%C3%A9n%20and%20Burgert%20%5B12%5D%20showed,1).
+
+  The purpose of Mini Project 3 is two-fold, (1) to quantify physical properties including Young's modulus for a segment of intestine in both circumferential and longitudinal orientations during loading and unloading phases and (2) to compare flexural stiffness of a wooden dowel in various orientations (flat/flipped), states (wet/dry), and with different rates of mass application (fast/slow). 
+  In this project, Young's modulus is a property that indicates the relative ease at which the intestine is stretched. Young's modulus is the ratio of stress to strain. According to X, both the longitudinal and circumferential muscles of the intestine stretch and contract to enable the movement of food and waste in a process called peristalsis. Notably, the intestine is more compliant along the circumferential axis in order to move varying volumes of food. This characteristic should be reflected in the relative difference between the Young's modulus calculated for the longitudinal and circumferential conditions. **Add interpretations about viscoelastic properties of the intestine explaining relative changes in the loading and unloading phases. 
+  Under expected conditions, the equation d = (Fl^3)/3EI governs the calculated flexural stiffness for the wooden dowel. The moment of inertia of the dowel is dependent on its orientation. In the flipped condition, the moment of inertia should be significantly greater resulting in greater flexural stiffness compared to the flat orientation. X paper indicates that water has plasticizing properties, suggesting that the observed flexural stiffness for the dry conditions should be greater than in the wet conditions. Finally, the rate at which the mass is applied to the dowel is expected to have an effect on the measured flexural stiffness of the dowel. Under the slow condition, the dowel is expected to undergo "creep" which is a gradual deformation of the material yielding larger observed flexural stiffness values. 
+  
+#Methods 
+
+Intestine Section:
+
+A pig intestine was cut into 2 sections (5-8 cm x 1 cm) in both an axial and circumferential orientation relative to the original intestine. The length, width, and thickness of the sections were obtained using calipers. Intestine sections were secured to a table using a binder clip.  A make-shift weight holder was then secured to the end of the intestinal section using dental floss. 2x 3.2 gram washers were added until a total load of 8 washers was obtained. Length measurements of the intestine were obtained after each addition of the two washers. Then, washers were unloaded in groups of 2 (as they were added), and length measurements were obtained each time the load was decreased. 
+
+Dowel Section:
+
+Length, width, and thickness measurements for two sections of birch were obtained. Utilizing a 3 point bending set-up, a load cell, and a program that utilizes a cylinder to depress the wood, the mass required to depress the wood 1 mm was obtained. 5 total trails were conducted with varying conditions in each of the trials. In the first 4 trials, the wood was in a flat orientation. The state of the wood(wet/dry) and the speed at which the mass was applied (fast/slow) was varied for these trials. In the 5th trial, a dry piece of wood was flipped on its side and mass was applied slowly. 
+
+#Results
+```{r}
+#Loading and transforming longitudinal data 
+
+
+data_longitudinal <- read_csv("Intestine_Longitudinal_Final.csv")
+
+
+original_length <- 0.0694
+
+data_longitudinal <- data_longitudinal %>%
+  mutate(
+    weight_count = (Trial - 1) * 2,
+    total_weight_mass = weight_count * 0.0032,  
+    force = total_weight_mass * 9.8,             
+    stress = force / 0.0000045,                 
+    strain_loading = (Loading_L - original_length) / original_length,
+    strain_unloading = (Unloading_L - original_length) / original_length
+  )
+
+
+#Calc Young's Modulus
+loading_regression_longitudinal <- lm(stress ~ strain_loading, data = data_longitudinal)
+unloading_regression_longitudinal <- lm(stress ~ strain_unloading, data = data_longitudinal)
+
+youngs_modulus_loading_longitudinal <- coef(loading_regression_longitudinal)[2]
+youngs_modulus_unloading_longitudinal <- coef(unloading_regression_longitudinal)[2]
+
+
+#Table 
+youngs_modulus_table_longitudinal <- tibble(
+  Phase = c("Loading", "Unloading"),
+  Youngs_Modulus_Pascals = c(youngs_modulus_loading_longitudinal, youngs_modulus_unloading_longitudinal)
+)
+```
+
+```{r}
+#Loading and transforming circumferential data 
+
+data_circumferential <- read_csv("Intestine_Circumferential_Final.csv")
+
+data_circumferential <- data_circumferential %>%
+  mutate(
+    weight_count = (Trial - 1) * 2,
+    total_weight_mass = weight_count * 0.0032,  
+    force = total_weight_mass * 9.8,             
+    stress = force / 0.0000034,                 
+    strain_loading = (Loading_L - original_length) / original_length,
+    strain_unloading = (Unloading_L - original_length) / original_length
+  )
+
+#Calc Young's Modulus
+loading_regression_circumferential <- lm(stress ~ strain_loading, data = data_circumferential)
+unloading_regression_circumferential <- lm(stress ~ strain_unloading, data = data_circumferential)
+
+
+youngs_modulus_loading_circumferential <- coef(loading_regression_circumferential)[2]
+youngs_modulus_unloading_circumferential <- coef(unloading_regression_circumferential)[2]
+
+#Table 
+youngs_modulus_table_circumferential <- tibble(
+  Phase = c("Loading", "Unloading"),
+  Youngs_Modulus_Pascals = c(youngs_modulus_loading_circumferential, youngs_modulus_unloading_circumferential)
+)
+```
+
+```{r}
+#Wood deflection 
+
+process_file <- function(file_path) {
+  data <- read_csv(file_path, col_names = c("Time_ms", "Mass_g"))
+  data <- data %>%
+    mutate(
+      Time_ms = as.numeric(Time_ms),
+      Mass_g = as.numeric(Mass_g)
+    )
+  min_mass_row <- data %>%
+                  filter(Mass_g == min(Mass_g, na.rm = TRUE)) %>%
+                  mutate(File = basename(file_path))
+  
+  return(min_mass_row)
+}
+
+file_paths <- c("flipped_slow_dry.txt",
+                "flat_slow_wet.txt",
+                "flat_slow_dry.txt",
+                "flat_fast_wet.txt",
+                "flat_fast_dry.txt")
+
+results <- bind_rows(lapply(file_paths, process_file))
+
+results <- results %>%
+  mutate(
+    Mass_g_abs = abs(Mass_g),
+    Force_N = Mass_g_abs / 1000 * 9.81,
+    length_m = 0.036,
+    deflection_m = 0.001,
+    EI = (Force_N * length_m^3) / (3 * deflection_m)
+  )
+
+print(results)
+```
+
+#Discussion 
+
+The findings of this mini-project are generally consistent with the expectations outlined in the introduction. Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than the longitudinally loaded section. These results suggest that the intestine is anisotropic which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with X (study referenced in introduction). Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. **Add interpretation about viscoelasticity here. The findings of the 3 point bend test of the wooden dowel also generally followed the expected results. The calculated flexural stiffness for the dry dowel was the largest comparatively at each respective speed of mass application. This is the expected result because water is a plasticizer which would result in a lower flexural stiffness for the wet dowel (Include reference to research paper about water being a plasticizer). Comparison between the flat_slow_wet and flat_fast_wet condition follows the expected result in which "creep" allowed by slow application of mass yields a larger calculated flexural stiffness. However, the calculated flexural stiffness for the flat_fast_dry was greater than than that calculated for the flat_slow_dry condition. 
+
+
+
+
+#Author Contributions 
+
+
+
