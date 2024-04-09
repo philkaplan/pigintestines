@@ -35,7 +35,7 @@ Length, width, and thickness measurements of a birch coffee stirrer were obtaine
 data_longitudinal <- read_csv("Intestine_Longitudinal_Final.csv")
 
 
-original_length <- 0.0694
+original_length <- 0.0481
 
 data_longitudinal <- data_longitudinal %>%
   mutate(
@@ -45,7 +45,7 @@ data_longitudinal <- data_longitudinal %>%
     stress = force / 0.0000045,                 
     strain_loading = (Loading_L - original_length) / original_length,
     strain_unloading = (Unloading_L - original_length) / original_length
-  )
+  ) %>% print()
 
 fig1dat <- data_longitudinal %>%
   select(stress, strain_loading, strain_unloading) %>%
@@ -69,7 +69,6 @@ youngs_modulus_table_longitudinal <- tibble(
   Youngs_Modulus_Pascals = c(youngs_modulus_loading_longitudinal, youngs_modulus_unloading_longitudinal)
 ) %>% print()
 ```
-Figure 1 depicts the relationship between stress and strain for the longitudinally-loaded intestinal section. Strain is negative due to force vector direction (downwards).
 
 
 ```{r circ data, echo = F, message = F, warning = F}
@@ -159,7 +158,10 @@ print(results)
 
 #Discussion 
 
-The findings of this mini-project are generally consistent with the expectations outlined in the introduction. Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than for the longitudinally loaded section. These results suggest that the intestine is anisotropic which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with X (study referenced in introduction). Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. **Add interpretation about viscoelasticity here. The findings of the 3 point bend test of the wooden dowel also generally followed the expected results. The calculated flexural stiffness for the dry dowel was the largest comparatively at each respective speed of mass application. This is the expected result because water is a plasticizer which would result in a lower flexural stiffness for the wet dowel (Include reference to research paper about water being a plasticizer). Comparison between the flat_slow_wet and flat_fast_wet condition follows the expected result in which "creep" allowed by slow application of mass yields a larger calculated flexural stiffness. However, the calculated flexural stiffness for the flat_fast_dry was greater than than that calculated for the flat_slow_dry condition.
+The findings of this mini-project are generally consistent with the expectations outlined in the introduction. 
+While the stress-strain curve for the longitudal orientation of the [...]
+
+Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than for the longitudinally loaded section. These results suggest that the intestine is anisotropic which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with X (study referenced in introduction). Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. **Add interpretation about viscoelasticity here. The findings of the 3 point bend test of the wooden dowel also generally followed the expected results. The calculated flexural stiffness for the dry dowel was the largest comparatively at each respective speed of mass application. This is the expected result because water is a plasticizer which would result in a lower flexural stiffness for the wet dowel (Include reference to research paper about water being a plasticizer). Comparison between the flat_slow_wet and flat_fast_wet condition follows the expected result in which "creep" allowed by slow application of mass yields a larger calculated flexural stiffness. However, the calculated flexural stiffness for the flat_fast_dry was greater than than that calculated for the flat_slow_dry condition.
 
   
   **Add interpretations about viscoelastic properties of the intestine explaining relative changes in the loading and unloading phases. 
