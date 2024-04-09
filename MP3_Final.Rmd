@@ -69,6 +69,8 @@ youngs_modulus_table_longitudinal <- tibble(
   Youngs_Modulus_Pascals = c(youngs_modulus_loading_longitudinal, youngs_modulus_unloading_longitudinal)
 ) %>% print()
 ```
+Figure 1 depicts the relationship between stress and strain for the longitudinally-loaded intestinal section. Strain is negative due to force vector direction (downwards).
+
 
 ```{r circ data, echo = F, message = F, warning = F}
 #Loading and transforming circumferential data 
@@ -120,7 +122,7 @@ process_file <- function(file_path) {
     )
   min_mass_row <- data %>%
                   filter(Mass_g == min(Mass_g, na.rm = TRUE)) %>%
-                  mutate(File = basename(file_path))
+                  mutate(File = gsub("_"," ",basename(file_path)))
   
   return(min_mass_row)
 }
@@ -140,9 +142,19 @@ results <- results %>%
     length_m = 0.036,
     deflection_m = 0.001,
     EI = (Force_N * length_m^3) / (3 * deflection_m)
-  )
+  ) %>% print()
 
-print(results)
+orient <- results %>%
+  select(File,EI) %>%
+  filter(results$File == File[1] | results$File==File[3]) %>%
+  mutate(Orientation = orient$File[][1]) %>%
+  print() 
+
+
+orient %>%
+  ggplot(aes(x=File,y=EI)) + geom_point(aes(y=EI))
+
+print(results) 
 ```
 
 #Discussion 
