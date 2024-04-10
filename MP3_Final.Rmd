@@ -12,24 +12,22 @@ library(tidyverse)
 library(knitr)
 ```
 
-#Introduction 
+#Introduction
 
-  The purpose of Mini Project 3 is two-fold, (1) to quantify physical properties including Young's modulus for a segment of intestine in both circumferential and longitudinal orientations during loading and unloading phases and (2) to compare flexural stiffness of a wooden stirrer in various orientations (flat/flipped), states (wet/dry), and with different rates of mass application (fast/slow). 
-  Both materials are anisotropic in that they have directionally dependent properties due to fiber arrangements. For example, wood grain is unidirectional and thus gives the material anisotropy, in that its “axial cellular elements” tend to be oriented similarly [@Bremaud2010]. Similarly, intestinal muscle is arranged both longitudinally and circumferentially, demonstrating the physiological connection between biology and function: pushing a bolus through the digestive tract.
-  Young's modulus is a property that assesses the relative ease at which the material is stretched. In essence, Young's modulus is the ratio of stress to strain. According to @Patel2023, both the longitudinal and circumferential muscles of the intestine stretch and contract to enable the movement of food and waste during peristalsis. Notably, the intestine is more compliant along the circumferential axis in order to move varying volumes of food. This characteristic should be reflected in the relative difference between the Young's modulus calculated for the longitudinal and circumferential conditions. 
-  Under expected conditions, the equation $\`d = (Fl^3)/3EI\'$ governs the calculated flexural stiffness for the wooden stirrer. The moment of inertia of the stirrer is dependent on its orientation. In the flipped condition, the moment of inertia should be significantly greater, resulting in greater flexural stiffness compared to the flat orientation. Water has plasticizing properties, suggesting that the observed flexural stiffness for the dry conditions should be greater than in the wet conditions [@Mvondo2017]. Finally, the rate at which the mass is applied to the stirrer is expected to have an effect on the measured flexural stiffness of the dowel. Under the slow condition, the stirrer is expected to undergo "creep", which is a gradual deformation of the material yielding larger observed flexural stiffness values. 
-  
-#Methods 
+The purpose of Mini Project 3 is two-fold, (1) to quantify physical properties including Young's modulus for a segment of intestine in both circumferential and longitudinal orientations during loading and unloading phases and (2) to compare flexural stiffness of a wooden stirrer in various orientations (flat/flipped), states (wet/dry), and with different rates of mass application (fast/slow). Both materials are anisotropic in that they have directionally dependent properties due to fiber arrangements. For example, wood grain is unidirectional and thus gives the material anisotropy, in that its "axial cellular elements" tend to be oriented similarly [@Bremaud2010]. Similarly, intestinal muscle is arranged both longitudinally and circumferentially, demonstrating the physiological connection between biology and function: pushing a bolus through the digestive tract. Young's modulus is a property that assesses the relative ease at which the material is stretched. In essence, Young's modulus is the ratio of stress to strain. According to @Patel2023, both the longitudinal and circumferential muscles of the intestine stretch and contract to enable the movement of food and waste during peristalsis. Notably, the intestine is more compliant along the circumferential axis in order to move varying volumes of food. This characteristic should be reflected in the relative difference between the Young's modulus calculated for the longitudinal and circumferential conditions. Under expected conditions, the equation $\`d = (Fl^3)/3EI\'$ governs the calculated flexural stiffness for the wooden stirrer. The moment of inertia of the stirrer is dependent on its orientation. In the flipped condition, the moment of inertia should be significantly greater, resulting in greater flexural stiffness compared to the flat orientation. Water has plasticizing properties, suggesting that the observed flexural stiffness for the dry conditions should be greater than in the wet conditions [@Mvondo2017]. Finally, the rate at which the mass is applied to the stirrer is expected to have an effect on the measured flexural stiffness of the dowel. Under the slow condition, the stirrer is expected to undergo "creep", which is a gradual deformation of the material yielding larger observed flexural stiffness values.
+
+#Methods
 
 Intestine Section:
 
-A pig intestine was cut into 2 sections (5-8 cm x 1 cm) both for axial and circumferential orientations relative to the original intestine. The length, width, and thickness of the sections were obtained using calipers. Intestine sections were secured to a table using a binder clip. A make-shift weight holder was then secured to the end of the intestinal section using dental floss. Pairs of 3.2 gram washers were added until a total load of 8 washers was obtained. Length measurements of the intestine were obtained after each addition of the two washers. Then, washers were unloaded in pairs (as they were added), and length measurements were obtained each time the load was decreased. 
+A pig intestine was cut into 2 sections (5-8 cm x 1 cm) both for axial and circumferential orientations relative to the original intestine. The length, width, and thickness of the sections were obtained using calipers. Intestine sections were secured to a table using a binder clip. A make-shift weight holder was then secured to the end of the intestinal section using dental floss. Pairs of 3.2 gram washers were added until a total load of 8 washers was obtained. Length measurements of the intestine were obtained after each addition of the two washers. Then, washers were unloaded in pairs (as they were added), and length measurements were obtained each time the load was decreased.
 
 Wood Section:
 
-Length, width, and thickness measurements of a birch coffee stirrer were obtained. Utilizing a 3 point bending set-up, a load cell, and a program utilizing a cylinder to depress the wood, the mass required to depress the wood 1 mm was obtained. 5 total trials were conducted with varying conditions in each of the trials. In the first 4 trials, the wood was in a flat orientation. The state of the wood (wet/dry) and the speed at which the mass was applied (fast/slow) was varied for these trials. In the 5th trial, a dry piece of wood was flipped on its side and mass was applied slowly. 
+Length, width, and thickness measurements of a birch coffee stirrer were obtained. Utilizing a 3 point bending set-up, a load cell, and a program utilizing a cylinder to depress the wood, the mass required to depress the wood 1 mm was obtained. 5 total trials were conducted with varying conditions in each of the trials. In the first 4 trials, the wood was in a flat orientation. The state of the wood (wet/dry) and the speed at which the mass was applied (fast/slow) was varied for these trials. In the 5th trial, a dry piece of wood was flipped on its side and mass was applied slowly.
 
 # Results
+
 ```{r long data, echo = F, warning = F, message = F}
 #Loading and transforming longitudinal data 
 
@@ -73,7 +71,6 @@ youngs_modulus_table_longitudinal <- tibble(
 youngs_modulus_table_longitudinal %>%
   ggplot(aes(x=Phase, y = Youngs_Modulus_Pascals)) + geom_point(stat="identity") + theme_minimal() + ggtitle("Figure 2: Young's Modulus for Longitudinal Section of Intestine") + xlab("Phase") + ylab("Young's Modulus (Pa)") + ylim(0,210000)
 ```
-
 
 ```{r circ data, echo = F, message = F, warning = F}
 #Loading and transforming circumferential data 
@@ -152,8 +149,7 @@ results <- results %>%
 orient <- results %>%
   select(File,EI) %>%
   filter(results$File == File[1] | results$File==File[3]) %>%
-  mutate(Orientation = c("Flipped", "Flat")) %>%
-  print()
+  mutate(Orientation = c("Flipped", "Flat"))
 
 orient %>%
   ggplot(aes(x=Orientation,y=EI)) + geom_point(stat = "identity") + ggtitle("Figure 5: Flexural Stiffness of Wood Depending on Orientation") + ylab("Flexural Stiffness") + theme_minimal()
@@ -161,19 +157,29 @@ orient %>%
 maxforce <- read.csv("maxforce.csv") %>%
   kable(caption = "Table 1: Maximum Force (N) to Deflect Wood") %>%
   print()
+
+ei <- read.csv("ei.csv") %>%
+  kable(caption = "Table 2: Wood Flexural Stiffness") %>%
+  print()
 ```
 
-#Discussion 
+#Discussion
 
-The findings of this mini-project are generally consistent with the expectations outlined in the introduction. 
+The findings of this mini-project are generally consistent with the expectations outlined in the introduction.
 
-Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than for the longitudinally loaded section (Figs. 2 and 4). These results suggest that the intestine is anisotropic, which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with the study conducted by @Mvondo2017. Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. This discrepancy makes sense when considering the physiological function of the tissues: the circumferential fiber arrangement is used to mix and propel food through the digestive system, and thus needs greater elasticity. On the other hand, the longitudinal fibers are expected to resist stress more and so resist large-scale stretching.
-The stress-strain curve for the longitudal orientation of the intestine shows that the energy absorbed by the tissue is not fully returned during unloading, as the unloading phase is positioned above the loading one. Inversely, the circumferential orientation of the intestine yielded a more traditional stress-strain curve, where the unloading phase demonstrates conservation of energy within the system. This echoes the viscoelastic nature of the intestinal tract.
+Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than for the longitudinally loaded section (Figs. 2 and 4). These results suggest that the intestine is anisotropic, which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with the study conducted by @Mvondo2017. Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. This discrepancy makes sense when considering the physiological function of the tissues: the circumferential fiber arrangement is used to mix and propel food through the digestive system, and thus needs greater elasticity. On the other hand, the longitudinal fibers are expected to resist stress more and so resist large-scale stretching. The stress-strain curve for the longitudal orientation of the intestine shows that the energy absorbed by the tissue is not fully returned during unloading, as the unloading phase is positioned above the loading one. Inversely, the circumferential orientation of the intestine yielded a more traditional stress-strain curve, where the unloading phase demonstrates conservation of energy within the system. This echoes the viscoelastic nature of the intestinal tract.
 
 The findings of the 3 point bend test of the wooden stirrer also generally followed the expected results. The calculated flexural stiffness for the dry dowel was the largest comparatively at each respective speed of mass application. This is the expected result because water is a plasticizer which results in a lower flexural stiffness for the wet wood [@Mvondo2017]. Comparison between the flat_slow_wet and flat_fast_wet condition follows the expected result in which "creep" allowed by slow application of mass yields a larger calculated flexural stiffness. However, the calculated flexural stiffness for the flat_fast_dry was greater than than that calculated for the flat_slow_dry condition.
 
-
-#Author Contributions 
-
-
-
+#Author Contributions
+- Phil:
+    + Intro
+    + Methods
+    + Results (code)
+    + Conclusions
+- Jaan:
+    + Intro
+    + Methods
+    + Results (code for figures and tables)
+    + Conclusions
+    + Bibliography
