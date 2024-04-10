@@ -9,6 +9,7 @@ bibliography: BIOL5380.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(knitr)
 ```
 
 #Introduction 
@@ -94,7 +95,7 @@ fig2dat <- data_circumferential %>%
   pivot_longer(!stress, values_to = "strain", names_to = "group")
 
 fig2dat %>%
-  ggplot(aes(x=strain, y=stress, col=group)) + geom_line() + ggtitle("Figure 2: Stress-Strain Curve for Longitudinal Section of Intestine")
+  ggplot(aes(x=strain, y=stress, col=group)) + geom_line() + ggtitle("Figure 3: Stress-Strain Curve for Circumferential Section of Intestine") + ylab("Strain (Pa)") + xlab("Stress") + labs(col="Phase") + theme_minimal()
 
 #Calc Young's Modulus
 loading_regression_circumferential <- lm(stress ~ strain_loading, data = data_circumferential)
@@ -108,8 +109,10 @@ youngs_modulus_unloading_circumferential <- coef(unloading_regression_circumfere
 youngs_modulus_table_circumferential <- tibble(
   Phase = c("Loading", "Unloading"),
   Youngs_Modulus_Pascals = c(youngs_modulus_loading_circumferential, youngs_modulus_unloading_circumferential)
-) %>%
-  print()
+)
+
+youngs_modulus_table_circumferential %>%
+  ggplot(aes(x=Phase, y = Youngs_Modulus_Pascals)) + geom_point(stat="identity") + theme_minimal() + ggtitle("Figure 4: Young's Modulus for Circumferential Section of Intestine") + xlab("Phase") + ylab("Young's Modulus (Pa)") + ylim(0,710000)
 ```
 
 ```{r wood def, echo = F, message = F, warning = F}
@@ -149,29 +152,25 @@ results <- results %>%
 orient <- results %>%
   select(File,EI) %>%
   filter(results$File == File[1] | results$File==File[3]) %>%
-  mutate(Orientation = orient$File[][1]) %>%
-  print() 
-
+  mutate(Orientation = c("Flipped", "Flat")) %>%
+  print()
 
 orient %>%
-  ggplot(aes(x=File,y=EI)) + geom_point(aes(y=EI))
+  ggplot(aes(x=Orientation,y=EI)) + geom_point(stat = "identity") + ggtitle("Figure 5: Flexural Stiffness of Wood Depending on Orientation") + ylab("Flexural Stiffness") + theme_minimal()
 
-print(results) 
+maxforce <- read.csv("maxforce.csv") %>%
+  kable(caption = "Table 1: Maximum Force (N) to Deflect Wood") %>%
+  print()
 ```
 
 #Discussion 
 
 The findings of this mini-project are generally consistent with the expectations outlined in the introduction. 
-While the stress-strain curve for the longitudal orientation of the [...]
 
-circumferential expected bc elastic bc of loading curves and energy dissipation
+Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than for the longitudinally loaded section (Figs. 2 and 4). These results suggest that the intestine is anisotropic, which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with the study conducted by @Mvondo2017. Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. This discrepancy makes sense when considering the physiological function of the tissues: the circumferential fiber arrangement is used to mix and propel food through the digestive system, and thus needs greater elasticity. On the other hand, the longitudinal fibers are expected to resist stress more and so resist large-scale stretching.
+The stress-strain curve for the longitudal orientation of the intestine shows that the energy absorbed by the tissue is not fully returned during unloading, as the unloading phase is positioned above the loading one. Inversely, the circumferential orientation of the intestine yielded a more traditional stress-strain curve, where the unloading phase demonstrates conservation of energy within the system. This echoes the viscoelastic nature of the intestinal tract.
 
-Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than for the longitudinally loaded section. These results suggest that the intestine is anisotropic which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with X (study referenced in introduction). Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. **Add interpretation about viscoelasticity here. The findings of the 3 point bend test of the wooden dowel also generally followed the expected results. The calculated flexural stiffness for the dry dowel was the largest comparatively at each respective speed of mass application. This is the expected result because water is a plasticizer which would result in a lower flexural stiffness for the wet dowel (Include reference to research paper about water being a plasticizer). Comparison between the flat_slow_wet and flat_fast_wet condition follows the expected result in which "creep" allowed by slow application of mass yields a larger calculated flexural stiffness. However, the calculated flexural stiffness for the flat_fast_dry was greater than than that calculated for the flat_slow_dry condition.
-
-  
-  **Add interpretations about viscoelastic properties of the intestine explaining relative changes in the loading and unloading phases. 
-
-
+The findings of the 3 point bend test of the wooden stirrer also generally followed the expected results. The calculated flexural stiffness for the dry dowel was the largest comparatively at each respective speed of mass application. This is the expected result because water is a plasticizer which results in a lower flexural stiffness for the wet wood [@Mvondo2017]. Comparison between the flat_slow_wet and flat_fast_wet condition follows the expected result in which "creep" allowed by slow application of mass yields a larger calculated flexural stiffness. However, the calculated flexural stiffness for the flat_fast_dry was greater than than that calculated for the flat_slow_dry condition.
 
 
 #Author Contributions 
