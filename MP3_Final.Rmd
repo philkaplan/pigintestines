@@ -49,10 +49,10 @@ data_longitudinal <- data_longitudinal %>%
 
 fig1dat <- data_longitudinal %>%
   select(stress, strain_loading, strain_unloading) %>%
-  pivot_longer(!stress, values_to = "strain", names_to = "group")
+  pivot_longer(!stress, values_to = "strain", names_to = "group") %>% print()
 
 fig1dat %>%
-  ggplot(aes(x=strain, y=stress, col=group)) + geom_line() + ggtitle("Figure 1: Stress-Strain Curve for Longitudinal Section of Intestine")
+  ggplot(aes(x=strain, y=stress, col=group)) + geom_line() + ggtitle("Figure 1: Stress-Strain Curve for Longitudinal Section of Intestine") + ylab("Strain (Pa)") + xlab("Stress") + labs(col="Phase") + theme_minimal()
 
 
 #Calc Young's Modulus
@@ -65,9 +65,12 @@ youngs_modulus_unloading_longitudinal <- coef(unloading_regression_longitudinal)
 
 #Table 
 youngs_modulus_table_longitudinal <- tibble(
-  Phase = c("Loading", "Unloading"),
+  Phase = as_factor(c("Loading", "Unloading")),
   Youngs_Modulus_Pascals = c(youngs_modulus_loading_longitudinal, youngs_modulus_unloading_longitudinal)
-) %>% print()
+)
+
+youngs_modulus_table_longitudinal %>%
+  ggplot(aes(x=Phase, y = Youngs_Modulus_Pascals)) + geom_point(stat="identity") + theme_minimal() + ggtitle("Figure 2: Young's Modulus for Longitudinal Section of Intestine") + xlab("Phase") + ylab("Young's Modulus (Pa)") + ylim(0,210000)
 ```
 
 
@@ -160,6 +163,8 @@ print(results)
 
 The findings of this mini-project are generally consistent with the expectations outlined in the introduction. 
 While the stress-strain curve for the longitudal orientation of the [...]
+
+circumferential expected bc elastic bc of loading curves and energy dissipation
 
 Young's modulus for both the loading and unloading phase of the circumferentially loaded intestinal section was greater than for the longitudinally loaded section. These results suggest that the intestine is anisotropic which is expected given the varying arrangements of collagen and muscle structure of the longitudinal and circumferential orientations of the intestine. This is consistent with X (study referenced in introduction). Notably, Young's modulus was greater in the unloading phase for the circumferentially loaded sample and greater in the loading phase in the longitudinally loaded sample. **Add interpretation about viscoelasticity here. The findings of the 3 point bend test of the wooden dowel also generally followed the expected results. The calculated flexural stiffness for the dry dowel was the largest comparatively at each respective speed of mass application. This is the expected result because water is a plasticizer which would result in a lower flexural stiffness for the wet dowel (Include reference to research paper about water being a plasticizer). Comparison between the flat_slow_wet and flat_fast_wet condition follows the expected result in which "creep" allowed by slow application of mass yields a larger calculated flexural stiffness. However, the calculated flexural stiffness for the flat_fast_dry was greater than than that calculated for the flat_slow_dry condition.
 
