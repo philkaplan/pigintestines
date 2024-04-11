@@ -51,7 +51,7 @@ fig1dat <- data_longitudinal %>%
   pivot_longer(!stress, values_to = "strain", names_to = "group")
 
 fig1dat %>%
-  ggplot(aes(x=strain, y=stress, col=group)) + geom_line() + ggtitle("Figure 1: Stress-Strain Curve for Longitudinal Section of Intestine") + ylab("Strain (Pa)") + xlab("Stress") + labs(col="Phase") + theme_minimal()
+  ggplot(aes(x=strain, y=stress, col=group)) + geom_point() + ggtitle("Figure 1: Loading and Unloading Curve for Longitudinal Section of Intestine") + ylab("Strain (Pa)") + xlab("Stress") + labs(col="Phase") + theme_minimal() + geom_smooth(method="lm",se=F)
 
 
 #Calc Young's Modulus
@@ -92,7 +92,7 @@ fig2dat <- data_circumferential %>%
   pivot_longer(!stress, values_to = "strain", names_to = "group")
 
 fig2dat %>%
-  ggplot(aes(x=strain, y=stress, col=group)) + geom_line() + ggtitle("Figure 3: Stress-Strain Curve for Circumferential Section of Intestine") + ylab("Strain (Pa)") + xlab("Stress") + labs(col="Phase") + theme_minimal()
+  ggplot(aes(x=strain, y=stress, col=group)) + geom_point() + ggtitle("Figure 3: Loading and Unloading Curve for Circumferential Section of Intestine") + ylab("Strain (Pa)") + xlab("Stress") + labs(col="Phase") + theme_minimal() + geom_smooth(method="lm", se=F)
 
 #Calc Young's Modulus
 loading_regression_circumferential <- lm(stress ~ strain_loading, data = data_circumferential)
